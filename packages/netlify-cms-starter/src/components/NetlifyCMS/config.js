@@ -72,7 +72,7 @@ export default {
       label: 'Settings',
       'delete': false,
       editor: {
-        preview: false
+        preview: true
       },
       files: [
         {
