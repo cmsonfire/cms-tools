@@ -102,7 +102,7 @@ const defaultConfig = {
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production'
-  defaultConfig.devtool = 'source-map'
+  defaultConfig.devtool = isProduction ? 'nosources-source-map' : 'source-map'
 
   return [defaultConfig]
 }
