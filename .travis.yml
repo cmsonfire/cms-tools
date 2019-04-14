@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+  - '8'
+cache:
+  yarn: true
+  directories:
+    - $HOME/.npm
+    - $HOME/.yarn-cache
+    - node_modules
+
+branches:
+  only:
+    - master
+
+install:
+  - yarn
+  - lerna bootstrap
+
+script:
+  - yarn workspace netlify-cms-backend-firestore build:lib
+
+after_success:
+  - yarn workspace netlify-cms-backend-fs semantic-release

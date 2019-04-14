@@ -1,0 +1,32 @@
+{
+  "name": "netlify-cms-starter",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "develop": "yarn start",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "netlify-cms-app": "^2.9.1",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4"
+  },
+  "devDependencies": {
+    "eslint": "5.12.0",
+    "lodash.flow": "^3.5.0",
+    "react-scripts": "^2.1.8"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Opera versions",
+    "last 2 Firefox versions",
+    "last 2 Edge versions",
+    "last 2 Safari versions",
+    "last 2 iOS versions",
+    "last 2 ChromeAndroid versions"
+  ],
+  "fileSystemPath": ""
+}

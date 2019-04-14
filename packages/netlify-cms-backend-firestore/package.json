@@ -1,0 +1,68 @@
+{
+  "name": "netlify-cms-backend-firestore",
+  "version": "0.0.0-development",
+  "description": "Backend for Netlify CMS to use Google Firestore",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ADARTA/netlify-cms-backend-firestore"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf dist",
+    "develop": "yarn build:dev -w",
+    "build:lib": "cross-env NODE_ENV=production webpack-cli --mode=production",
+    "build:dev": "cross-env NODE_ENV=development webpack-cli --mode=development",
+    "build": "run-s clean build:lib",
+    "dev": "run-s build:dev",
+    "format": "prettier --write \"src/**/*.js\"",
+    "prepublishOnly": "echo \"Create test and lint - (npm run test && npm run lint)\"",
+    "version": "run-s format",
+    "semantic-release:local": "semantic-release pre --debug=false && npm publish && semantic-release post --debug=false",
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "firebase": "^5.9.4",
+    "firebaseui": "^3.5.2",
+    "gray-matter": "^4.0.1",
+    "js-base64": "^2.4.9"
+  },
+  "devDependencies": {
+    "cp-cli": "^2.0.0",
+    "cross-env": "^5.2.0",
+    "css-loader": "^2.1.1",
+    "semantic-release": "^15.13.3",
+    "style-loader": "^0.23.1",
+    "webpack-cli": "^3.2.3"
+  },
+  "peerDependencies": {
+    "@emotion/core": "^10.0.9",
+    "@emotion/styled": "^10.0.9",
+    "lodash": "^4.17.11",
+    "react": "^16.8.4",
+    "uuid": "^3.3.2"
+  },
+  "keywords": [
+    "adarta",
+    "netlify-cms",
+    "backend"
+  ],
+  "author": {
+    "name": "Tony Alves",
+    "email": "tony@3alves.com",
+    "url": "http://www.3alves.com/"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Opera versions",
+    "last 2 Firefox versions",
+    "last 2 Edge versions",
+    "last 2 Safari versions",
+    "last 2 iOS versions",
+    "last 2 ChromeAndroid versions"
+  ]
+}
