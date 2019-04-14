@@ -1,22 +1,27 @@
 import React from 'react'
+import Markdown from 'react-markdown'
 
-export default class AuthorsPreview extends React.Component {
-  render () {
-    return (
-      <div>
-        <h1>Authors</h1>
-        {
-          this.props.widgetsFor('authors').map( (author, index) => {
-            return (
-              <div key={ index }>
-                <hr />
-                <strong>{ author.getIn(['data', 'name']) }</strong>
-                { author.getIn(['widgets', 'description']) }
-              </div>
-            )
-          })
-        }
-      </div>
-    )
-  }
+const AuthorsPreview = ({ entry }) => {
+  const [data, setData] = React.useState({ authors: [] })
+
+  React.useEffect(() => {
+    const data = entry.getIn(['data']).toJS()
+    setData(data)
+  }, [entry])
+
+  return data.authors && data.authors.length > 0 ? (
+    data.authors.map((author, index) => {
+      return (
+        <div key={index}>
+          <hr />
+          <div><strong>{author.name}</strong></div>
+          <section><Markdown>{author.description}</Markdown></section>
+        </div>
+      )
+    })
+  ) : (
+    <div />
+  )
 }
+
+export default AuthorsPreview
