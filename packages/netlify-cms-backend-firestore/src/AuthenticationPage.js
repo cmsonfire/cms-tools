@@ -36,7 +36,7 @@ function AuthenticationPage({ config, onLogin, inProgress }) {
   const [loggingIn, setLoggingIn] = React.useState(inProgress)
   const [uiConfig, setUiConfig] = React.useState(null)
   const [firebaseAuth, setFirebaseAuth] = React.useState(null)
-  
+
   const logoSrc = config.get('logo_src')
   const handleLogin = user => {
     setSignedIn(!!user)
@@ -51,7 +51,7 @@ function AuthenticationPage({ config, onLogin, inProgress }) {
     const firebase = window['__firebasecms__'].firebase
     if (!firebase) throw 'firebase missing'
     if (firebase && !firebase.auth) throw 'firebase auth missing'
-    
+
     /**
      * Get the signInOptions from the config to build uiConfig using getConfig
      */
@@ -71,12 +71,11 @@ function AuthenticationPage({ config, onLogin, inProgress }) {
   return (
     <SectionWrapper>
       <CustomLogoIcon imageSrc={logoSrc} />
-      { loggingIn &&
-        <div>...Logging In</div>
-      }
-      { !isSignedIn && !loggingIn && uiConfig && firebaseAuth &&
+      {!isSignedIn && !loggingIn && uiConfig && firebaseAuth ? (
         <FirebaseLogin onLogin={handleLogin} uiConfig={uiConfig} firebaseAuth={firebaseAuth} />
-      }
+      ) : (
+        <div>...Logging In</div>
+      )}
     </SectionWrapper>
   )
 }
