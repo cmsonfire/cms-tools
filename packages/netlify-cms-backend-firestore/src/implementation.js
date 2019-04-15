@@ -43,6 +43,8 @@ export default class NetlifyCmsBackendFirestore {
       this.db = firebase.app().firestore() // Existing Firestore
     }
 
+    // Setup the site path for access to this sites data
+    this.siteDocument = `sites/${firebaseSettings.siteid || 'default'}`
     // Setup Firebase Storage reference for media folder
     this.mediaFolder = this.config.media_folder || 'media_folder'
     this.mediaRef = firebase.storage().ref()
@@ -77,7 +79,7 @@ export default class NetlifyCmsBackendFirestore {
     const folder = collection.get('name') // name of folder collection
     console.log(`entriesByFolder for ${folder}`, collection)
     return firestoreDB
-      .collection(`${folder}`)
+      .collection(`${this.siteDocument}/${folder}`)
       .get()
       .then(returnQuery => {
         const entries = []
@@ -114,7 +116,7 @@ export default class NetlifyCmsBackendFirestore {
     return Promise.all(
       files.map(file =>
         firestoreDB
-          .doc(`${file.collectionName}/${file.documentID}`)
+          .doc(`${this.siteDocument}/${file.collectionName}/${file.documentID}`)
           .get()
           .then(doc => {
             if (!doc.exists)
@@ -142,7 +144,7 @@ export default class NetlifyCmsBackendFirestore {
 
     return Promise.resolve(
       firestoreDB
-        .doc(`${documentPath}`)
+        .doc(`${this.siteDocument}/${documentPath}`)
         .get()
         .then(doc => {
           if (!doc.exists) throw new Error(`Entry is missing for [${documentPath}]`)
@@ -185,11 +187,11 @@ export default class NetlifyCmsBackendFirestore {
     }
 
     return firestoreDB
-      .doc(`${options.collectionName}/${entry.slug}`)
+      .doc(`${this.siteDocument}/${options.collectionName}/${entry.slug}`)
       .get()
       .then(publishedDoc => {
         return firestoreDB
-          .doc(`__unpublished/${options.collectionName}_${entry.slug}`)
+          .doc(`${this.siteDocument}/__unpublished/${options.collectionName}_${entry.slug}`)
           .get()
           .then(unpublishedDoc => {
             const bothExist = publishedDoc.exists && unpublishedDoc.exists
@@ -243,7 +245,7 @@ export default class NetlifyCmsBackendFirestore {
   getMedia() {
     const firestoreDB = this.db
     return firestoreDB
-      .collection(`${this.mediaFolder}`)
+      .collection(`${this.siteDocument}/${this.mediaFolder}`)
       .get()
       .then(returnQuery => {
         const entries = []
@@ -276,7 +278,7 @@ export default class NetlifyCmsBackendFirestore {
         const entry = { name, size, path: downloadURL, url: downloadURL, sourcePath: imagePath }
         // Store metadata in images collection
         return firestoreDB
-          .collection(`${this.mediaFolder}`)
+          .collection(`${this.siteDocument}/${this.mediaFolder}`)
           .add(entry)
           .then(docRef => {
             entry.id = docRef.id
@@ -298,7 +300,7 @@ export default class NetlifyCmsBackendFirestore {
 
     console.log(`deleteFile ${collectionName}/${slug}`, collection, collection.get('slug'))
     return firestoreDB
-      .collection(`${collectionName}`)
+      .collection(`${this.siteDocument}/${collectionName}`)
       .doc(`${slug}`)
       .delete()
       .then(returnQuery => {
@@ -313,7 +315,7 @@ export default class NetlifyCmsBackendFirestore {
   unpublishedEntries() {
     const firestoreDB = this.db
     return firestoreDB
-      .collection('__unpublished')
+      .collection(`${this.siteDocument}/__unpublished`)
       .get()
       .then(querySnapshot => {
         const items = []
@@ -342,11 +344,11 @@ export default class NetlifyCmsBackendFirestore {
     const documentID = `${collectionName}_${slug}`
 
     return firestoreDB
-      .doc(`${collectionName}/${slug}`)
+      .doc(`${this.siteDocument}/${collectionName}/${slug}`)
       .get()
       .then(publishedDoc => {
         return firestoreDB
-          .doc(`__unpublished/${documentID}`)
+          .doc(`${this.siteDocument}/__unpublished/${documentID}`)
           .get()
           .then(unpublishedDoc => {
             if (unpublishedDoc.exists) {
@@ -389,7 +391,7 @@ export default class NetlifyCmsBackendFirestore {
     const documentID = `${collectionName}_${slug}`
     const storedEntry = { metaData: { status: newStatus } }
     return firestoreDB
-      .doc(`__unpublished/${documentID}`)
+      .doc(`${this.siteDocument}/__unpublished/${documentID}`)
       .get()
       .then(unpublishedDoc => {
         if (unpublishedDoc.exists) {
@@ -407,7 +409,7 @@ export default class NetlifyCmsBackendFirestore {
 
     console.log(`deleteFile __unpublished/${documentID}`, collectionName)
     return firestoreDB
-      .collection(`${'__unpublished'}`)
+      .collection(`${this.siteDocument}/${'__unpublished'}`)
       .doc(`${documentID}`)
       .delete()
       .then(returnQuery => {
@@ -424,7 +426,7 @@ export default class NetlifyCmsBackendFirestore {
     const documentID = `${collectionName}_${slug}`
 
     return firestoreDB
-      .doc(`__unpublished/${documentID}`)
+      .doc(`${this.siteDocument}/__unpublished/${documentID}`)
       .get()
       .then(unpublishedDoc => {
         if (unpublishedDoc.exists) {
@@ -437,7 +439,7 @@ export default class NetlifyCmsBackendFirestore {
             }], change to [Ready]`
           }
           return firestoreDB
-            .doc(`${collectionName}/${slug}`)
+            .doc(`${this.siteDocument}/${collectionName}/${slug}`)
             .get()
             .then(publishedDoc => {
               const options = {
@@ -459,7 +461,7 @@ export default class NetlifyCmsBackendFirestore {
             })
             .catch(error => Promise.reject(error))
         } else {
-          return Promise.reject(new Error(`__unpublished/${documentID} missing`))
+          return Promise.reject(new Error(`${this.siteDocument}/__unpublished/${documentID} missing`))
         }
       })
       .catch(error => Promise.reject(error))

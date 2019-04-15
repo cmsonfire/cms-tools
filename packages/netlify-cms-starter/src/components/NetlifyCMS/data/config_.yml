@@ -2,6 +2,7 @@
 backend:
   name: firestore
   firebase :
+    siteid: "default"
     index_data:
       posts: md
     config:

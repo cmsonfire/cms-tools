@@ -20,4 +20,4 @@ script:
   - yarn workspace netlify-cms-backend-firestore build:lib
 
 after_success:
-  - yarn workspace netlify-cms-backend-fs semantic-release
+  - yarn workspace netlify-cms-backend-firestore semantic-release
