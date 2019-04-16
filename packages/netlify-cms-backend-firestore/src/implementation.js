@@ -462,7 +462,9 @@ export default class NetlifyCmsBackendFirestore {
             })
             .catch(error => Promise.reject(error))
         } else {
-          return Promise.reject(new Error(`${this.siteDocument}/__unpublished/${documentID} missing`))
+          return Promise.reject(
+            new Error(`${this.siteDocument}/__unpublished/${documentID} missing`),
+          )
         }
       })
       .catch(error => Promise.reject(error))
