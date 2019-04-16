@@ -149,10 +149,11 @@ export default class NetlifyCmsBackendFirestore {
         .then(doc => {
           if (!doc.exists) throw new Error(`Entry is missing for [${documentPath}]`)
           const data = doc.data()
-          console.log('getEntry data', Base64.decode(data.raw))
+          // console.log('getEntry data', Base64.decode(data.raw))
+          console.log('getEntry data', data)
           return {
-            file: { path: data.path },
-            data: Base64.decode(data.raw),
+            file: { path: data.path || path },
+            data: data.raw ? Base64.decode(data.raw) : '',
           }
         })
         .catch(error => {
