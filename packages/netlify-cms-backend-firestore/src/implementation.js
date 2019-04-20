@@ -1,6 +1,7 @@
 import { getMatter, EditorialWorkflowError } from './utils'
 import AuthenticationPage from './AuthenticationPage'
 import { Base64 } from 'js-base64'
+import axios from 'axios'
 
 /**
  * Firebase/Firestore
@@ -51,6 +52,13 @@ export default class NetlifyCmsBackendFirestore {
     this.initialWorkflowStatus = options.initialWorkflowStatus
     this.usingEditorialWorkflow = this.config.publish_mode === 'editorial_workflow'
     this.indexData = firebaseSettings.index_data || {}
+    // Setup build_hooks for preview and production deploy
+    this.build_hooks = this.config.backend.build_hook
+      ? {
+        preview: `${this.config.backend.build_hook}?trigger_branch=preview&trigger_title=Preview+build+cms`,
+        master: `${this.config.backend.build_hook}?trigger_branch=master&trigger_title=Production+build+cms`,
+      }
+      : {}
   }
 
   authComponent() {
@@ -217,6 +225,11 @@ export default class NetlifyCmsBackendFirestore {
               return dbDocRef
                 .update(storedEntry)
                 .then(returnQuery => {
+                  if (options.useWorkflow) {
+                    if (this.build_hooks.preview) axios.post(this.build_hooks.preview)
+                  } else {
+                    if (this.build_hooks.master) axios.post(this.build_hooks.master)
+                  }
                   return Promise.resolve(editEntry)
                 })
                 .catch(error => {
@@ -226,6 +239,11 @@ export default class NetlifyCmsBackendFirestore {
               return dbDocRef
                 .set(storedEntry)
                 .then(returnQuery => {
+                  if (options.useWorkflow) {
+                    if (this.build_hooks.preview) axios.post(this.build_hooks.preview)
+                  } else {
+                    if (this.build_hooks.master) axios.post(this.build_hooks.master)
+                  }
                   return Promise.resolve(editEntry)
                 })
                 .catch(error => {
@@ -399,6 +417,7 @@ export default class NetlifyCmsBackendFirestore {
           const metaData = unpublishedDoc.data().metaData
           metaData.status = newStatus
           unpublishedDoc.ref.update({ metaData })
+          if (this.build_hooks.preview) axios.post(this.build_hooks.preview)
           return Promise.resolve()
         }
       })
