@@ -291,9 +291,9 @@ export default class NetlifyCmsBackendFirestore {
 
     return imageRef
       .put(fileObj)
-      .then(snapshot => {
-        console.log('imageUploaded', snapshot)
-        const downloadURL = snapshot.downloadURL
+      .then(snapshot => { return snapshot.ref.getDownloadURL()})
+      .then(downloadURL => {
+        console.log('imageUploaded', downloadURL)
         const entry = { name, size, path: downloadURL, url: downloadURL, sourcePath: imagePath }
         // Store metadata in images collection
         return firestoreDB
