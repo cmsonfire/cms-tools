@@ -12,7 +12,7 @@
   "dependencies": {
     "firebase-react-provider": "^0.1.1",
     "netlify-cms-app": "^2.12.25",
-    "netlify-cms-backend-firestore": "0.0.0-development",
+    "netlify-cms-backend-firestore": "*",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-markdown": "4.3.1"
