@@ -8,7 +8,6 @@
     "start": "yarn clean && yarn start:cra",
     "start:cra": "yarn workspace netlify-cms-starter start",
     "serve:build": "serve -s packages/netlify-cms-starter/build",
-    "build": "lerna run build",
     "build:backend": "yarn workspace netlify-cms-backend-firestore build",
     "build:starter": "yarn workspace netlify-cms-starter build"
   },
