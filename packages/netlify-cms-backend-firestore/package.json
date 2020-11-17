@@ -19,12 +19,11 @@
     "build:lib:wp": "cross-env NODE_ENV=production webpack-cli --mode=production",
     "build:dev:wp": "cross-env NODE_ENV=development webpack-cli --mode=development",
     "build:lib": "rollup -c",
-    "build:dev": "rollup -c -w",
-    "build": "yarn clean && yarn build:lib",
+    "build:dev": "yarn clean && rollup -c -w",
+    "build": "yarn build:lib",
     "dev": "yarn build:dev",
     "format": "prettier --write \"src/**/*.js\"",
     "prepublishOnly": "echo \"Create test and lint - (npm run test && npm run lint)\"",
-    "release": "yarn build:lib && yarn changeset publish",
     "version": "yarn format"
   },
   "dependencies": {
