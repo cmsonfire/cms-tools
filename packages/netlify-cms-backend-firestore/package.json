@@ -71,5 +71,8 @@
     "last 2 Safari versions",
     "last 2 iOS versions",
     "last 2 ChromeAndroid versions"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
