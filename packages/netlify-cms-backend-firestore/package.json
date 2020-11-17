@@ -4,7 +4,7 @@
   "description": "Backend for Netlify CMS to use Google Firestore",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ADARTA/netlify-cms-backend-firestore"
+    "url": "https://github.com/cmsonfire/cms-tools/tree/main/packages/netlify-cms-backend-firestore"
   },
   "main": "dist/index.js",
   "module": "dist/es/index.js",
@@ -24,6 +24,7 @@
     "dev": "yarn build:dev",
     "format": "prettier --write \"src/**/*.js\"",
     "prepublishOnly": "echo \"Create test and lint - (npm run test && npm run lint)\"",
+    "release": "yarn build:lib && yarn changeset publish",
     "version": "yarn format"
   },
   "dependencies": {

@@ -12,7 +12,12 @@
     "build:backend": "yarn workspace netlify-cms-backend-firestore build",
     "build:starter": "yarn workspace netlify-cms-starter build"
   },
+  "dependencies": {
+    "@changesets/cli": "^2.11.2"
+  },
   "devDependencies": {
+    "husky": "^4.3.0",
+    "lint-staged": "^10.4.0",
     "prettier": "^2.1.2",
     "rimraf": "^3.0.2"
   },
