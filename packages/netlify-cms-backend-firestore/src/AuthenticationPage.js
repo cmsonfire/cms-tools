@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 
 import FirebaseLogin from './components/FirebaseLogin'
 import getConfig from './components/FirebaseLogin/config'
+import { firebase } from 'firebase-react-provider'
 
 const SectionWrapper = styled('section')`
   display: flex;
@@ -32,13 +33,18 @@ const CustomLogoIcon = ({ imageSrc }) => {
 }
 
 function AuthenticationPage({ config, onLogin, inProgress }) {
+  const appName =
+    config.backend.firebase && config.backend.firebase.appName
+      ? config.backend.firebase.appName
+      : '[DEFAULT]'
+  console.log(appName, config.backend.firebase.config)
   const [isSignedIn, setSignedIn] = React.useState(false)
   const [loggingIn, setLoggingIn] = React.useState(inProgress)
   const [uiConfig, setUiConfig] = React.useState(null)
-  const [firebaseAuth, setFirebaseAuth] = React.useState(null)
+  const [auth, setFirebaseAuth] = React.useState()
 
-  const logoSrc = config.get('logo_src')
-  const handleLogin = user => {
+  const logoSrc = config.logo_src
+  const handleLogin = (user) => {
     setSignedIn(!!user)
     if (user) onLogin(user)
   }
@@ -48,31 +54,35 @@ function AuthenticationPage({ config, onLogin, inProgress }) {
      * Hack at this point to use firebase state from implementation
      * because there is no state passed at this time.
      */
-    const firebase = window['__firebasecms__'].firebase
-    if (!firebase) throw 'firebase missing'
-    if (firebase && !firebase.auth) throw 'firebase auth missing'
+    // const firebase = window['__firebasecms__'].firebase
+    // console.log('firebase:',firebase)
+    // if (!firebase) throw 'firebase missing'
+    // if (firebase && !firebase.auth) throw 'firebase auth missing'
 
     /**
      * Get the signInOptions from the config to build uiConfig using getConfig
      */
-    const baseConfig = config.toJS()
-    const firebaseSettings = baseConfig.backend.firebase
-    const signInOptions = firebaseSettings ? firebaseSettings.signInOptions || [] : []
+    // const baseConfig = config.toJS()
 
+    const firebaseSettings = config.backend.firebase
+    const signInOptions = firebaseSettings ? firebaseSettings.signInOptions || [] : []
     setUiConfig(getConfig({ auth: firebase.auth, signInOptions }))
-    setFirebaseAuth(firebase.auth())
-  })
+
+    const appAuth = firebase.auth(firebase.app(appName))
+    if (!appAuth) return
+    appAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    setFirebaseAuth(appAuth)
+  }, [])
 
   React.useEffect(() => {
-    console.log('inProgress:', inProgress)
     setLoggingIn(inProgress)
   }, [inProgress])
 
   return (
     <SectionWrapper>
       <CustomLogoIcon imageSrc={logoSrc} />
-      {!isSignedIn && !loggingIn && uiConfig && firebaseAuth ? (
-        <FirebaseLogin onLogin={handleLogin} uiConfig={uiConfig} firebaseAuth={firebaseAuth} />
+      {!isSignedIn && !loggingIn && uiConfig && auth ? (
+        <FirebaseLogin onLogin={handleLogin} uiConfig={uiConfig} firebaseAuth={auth} />
       ) : (
         <div>...Logging In</div>
       )}

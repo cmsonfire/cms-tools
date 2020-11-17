@@ -1,83 +1,82 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-
-// Use this to modify this component
-// https://github.com/firebase/firebaseui-web-react/blob/master/src/FirebaseAuth.jsx
+import React from 'react'
+// import PropTypes from 'prop-types'
+import * as firebaseui from 'firebaseui'
 
 // Global ID for the element.
 const ELEMENT_ID = 'firebaseui_container'
-// Promise that resolves unless the FirebaseUI instance is currently being deleted.
-let firebaseUiDeletion = Promise.resolve()
 
-class FirebaseLogin extends Component {
-  constructor(props) {
-    super(props)
+const FirebaseLogin = ({
+  uiConfig,
+  firebaseAuth,
+  uiCallback,
+  onLogin,
+  elementId = ELEMENT_ID,
+  className,
+}) => {
+  const [userSignedIn, setUserSignedIn] = React.useState(false)
+  const [user, setUser] = React.useState(null)
+  const [firebaseUiWidget, setFirebaseUiWidget] = React.useState(
+    firebaseui.auth.AuthUI.getInstance(),
+  )
+  const loginRef = React.useRef()
 
-    this.uiConfig = props.uiConfig
-    this.firebaseAuth = props.firebaseAuth
-    this.uiCallback = props.uiCallback
-    this.unregisterAuthObserver = () => {}
-    this.onLogin = props.onLogin
-    this.elid = props.elementId || ELEMENT_ID
-    this.className = props.className
+  function onAuthStateChanged() {
+    return firebaseAuth.onAuthStateChanged((user) => {
+      setUser(user)
+    })
   }
-  componentDidMount() {
-    // Import the css only on the client.
+
+  React.useEffect(() => {
     require('firebaseui/dist/firebaseui.css')
+    const unregisterAuthObserver = onAuthStateChanged()
+    return () => {
+      unregisterAuthObserver()
+    }
+  }, [])
 
-    // Firebase UI only works on the Client. So we're loading in `componentDidMount`.
-    const firebaseui = require('firebaseui')
+  React.useEffect(() => {
+    setUserSignedIn(!!user)
+    if (!!user) onLogin(user)
+  }, [user])
 
-    // Wait in case the firebase UI instance is being deleted.
-    // This can happen if you unmount/remount the element quickly.
-    return firebaseUiDeletion.then(() => {
-      // Get or Create a firebaseUI instance.
-      this.firebaseUiWidget =
-        firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(this.firebaseAuth)
-      if (this.uiConfig.signInFlow === 'popup') {
-        this.firebaseUiWidget.reset()
+  React.useEffect(() => {
+    if (userSignedIn) {
+      firebaseUiWidget.reset()
+    }
+  }, [userSignedIn])
+
+  React.useEffect(() => {
+    if (!loginRef.current) return
+
+    const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebaseAuth)
+    setFirebaseUiWidget(ui)
+
+    // Specify how to clean up after this effect:
+    return async function cleanup() {
+      if (firebaseUiWidget) {
+        return await firebaseUiWidget.delete()
+      } else {
+        return
       }
+    }
+  }, [firebaseAuth])
 
-      // We track the auth state to reset firebaseUi if the user signs out.
-      this.userSignedIn = false
-      this.unregisterAuthObserver = this.firebaseAuth.onAuthStateChanged(user => {
-        if (!user && this.userSignedIn) {
-          this.firebaseUiWidget.reset()
-        }
-        this.userSignedIn = !!user
-        if (this.userSignedIn) this.onLogin(user)
-      })
+  React.useEffect(() => {
+    if (!loginRef.current || !firebaseUiWidget) return
 
-      // Trigger the callback if any was set.
-      if (this.uiCallback) {
-        this.uiCallback(this.firebaseUiWidget)
-      }
+    // Trigger the callback if any was set.
+    if (uiCallback) {
+      uiCallback(firebaseUiWidget)
+    }
 
-      // Render the firebaseUi Widget.
-      this.firebaseUiWidget.start(`#${this.elid}`, this.uiConfig)
-    })
-  }
+    // Render the firebaseUi Widget.
+    // firebaseUiWidget.start(`#${elementId}`, uiConfig)
+    // if (firebaseUiWidget.isPendingRedirect()) {
+    firebaseUiWidget.start(loginRef.current, uiConfig)
+    // }
+  }, [loginRef.current, firebaseUiWidget])
 
-  componentWillUnmount() {
-    firebaseUiDeletion = firebaseUiDeletion.then(() => {
-      this.unregisterAuthObserver()
-      return this.firebaseUiWidget.delete()
-    })
-    return firebaseUiDeletion
-  }
-
-  render() {
-    return <div className={this.className} id={this.elid} />
-  }
-}
-
-FirebaseLogin.propTypes = {
-  elementId: PropTypes.string,
-  onLogin: PropTypes.func.isRequired,
-  uiCallback: PropTypes.func,
-  className: PropTypes.string,
-  uiConfig: PropTypes.object,
-  firebaseAuth: PropTypes.object,
+  return <div ref={loginRef} className={className} id={`${elementId}`} />
 }
 
 export default FirebaseLogin

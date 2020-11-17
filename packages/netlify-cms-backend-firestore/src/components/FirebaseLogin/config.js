@@ -21,10 +21,11 @@ const getUIConfig = ({ auth, signInOptions }) => {
         // or whether we leave that to developer to handle (false).
       },
     },
+    signInFlow: 'popup',
   }
   if (!auth) throw 'Firebase Auth Missing'
   if (signInOptions)
-    uiConfig.signInOptions = signInOptions.map(item => {
+    uiConfig.signInOptions = signInOptions.map((item) => {
       if (typeof item === 'string') {
         return auth[item].PROVIDER_ID
       }

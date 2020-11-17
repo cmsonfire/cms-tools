@@ -90,7 +90,7 @@ const defaultConfig = {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
     library: 'NetlifyCmsBackendFirestore',
-    libraryTarget: 'umd',
+    libraryTarget: 'global',
     libraryExport: 'NetlifyCmsBackendFirestore',
     umdNamedDefine: true,
   },

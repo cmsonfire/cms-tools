@@ -1,4 +1,4 @@
 import NetlifyCmsBackendFirestore from './implementation'
+import { FirestoreProvider } from './firestore-react-provider'
 
-export { NetlifyCmsBackendFirestore }
-export default NetlifyCmsBackendFirestore
+export { NetlifyCmsBackendFirestore, FirestoreProvider }
