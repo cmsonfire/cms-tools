@@ -4,6 +4,12 @@ import AuthenticationPage from './AuthenticationPage';
 import axios from 'axios';
 import { firebase } from 'firebase-react-provider';
 
+// Log version
+if (typeof window !== 'undefined') {
+  if (typeof PACKAGE_VERSION === 'string')
+    console.log(`netlify-cms-backend-firestore ${PACKAGE_VERSION}`);
+}
+
 /**
  * Firebase/Firestore (deprecated for FirebaseProvider)
  */
@@ -21,14 +27,14 @@ import { firebase } from 'firebase-react-provider';
 //   window['__firebasecms__'] = { firebase }
 // }
 
-const nameFromEmail = (email) => {
+const nameFromEmail = email => {
   return email
     .split('@')
     .shift()
     .replace(/[.-_]/g, ' ')
     .split(' ')
-    .filter((f) => f)
-    .map((s) => s.substr(0, 1).toUpperCase() + (s.substr(1) || ''))
+    .filter(f => f)
+    .map(s => s.substr(0, 1).toUpperCase() + (s.substr(1) || ''))
     .join(' ');
 };
 
@@ -40,7 +46,7 @@ const nameFromEmail = (email) => {
   See: https://www.freecodecamp.org/news/class-vs-factory-function-exploring-the-way-forward-73258b6a8d15/
     
 */
-const NetlifyCmsBackendFirestore = function (config, options = {}) {
+const NetlifyCmsBackendFirestore = function(config, options = {}) {
   // console.log(`Setting up NetlifyCmsBackendFirestore`, config, options)
   const constructor = (config, options) => {
     /* 
@@ -56,7 +62,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       config.backend.firebase && config.backend.firebase.appName
         ? config.backend.firebase.appName
         : '[DEFAULT]';
-    const app = firebase.apps.find((app) => app.container && app.container.name === appName);
+    const app = firebase.apps.find(app => app.container && app.container.name === appName);
     const db = () => {
       if (app) {
         return firebase.firestore(app); // Existing Firestore
@@ -69,7 +75,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     // Setup observer for signed in user
     // (deprecated for now; no state change once already logged in) needs research
     let loggedInUser = null;
-    const unsubscribeAuthListener = firebase.auth(app).onAuthStateChanged(function (user) {
+    const unsubscribeAuthListener = firebase.auth(app).onAuthStateChanged(function(user) {
       local.log(`user status changed`, user);
       loggedInUser = user;
     });
@@ -77,11 +83,11 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       unsubscribeAuthListener();
       firebase && firebase.auth && firebase.auth(app).signOut();
     };
-    const FilePathFactory = (filePath) => {
+    const FilePathFactory = filePath => {
       if (!filePath && typeof filePath !== 'string')
         throw `Invalid FilePathFactory call [${filePath}]`;
       return {
-        updateInfo: (info) => {
+        updateInfo: info => {
           fileinfo[filePath] = info;
         },
         deleteInfo: () => {
@@ -126,7 +132,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       if (!filePath) throw `collection [${collectionName}, ${slug}] missing from config`;
       return filePath;
     };
-    const getCollectionName = (folder) => {
+    const getCollectionName = folder => {
       let collectionName;
       for (let i = 0; i < config.collections.length; i++) {
         const collection = config.collections[i];
@@ -150,7 +156,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       We use the config to get our file path collection and name
       since it is not being passed from the api request in netlify-cms
     */
-      getFileCollectionByPath: (path) => {
+      getFileCollectionByPath: path => {
         let collectionByPath;
         for (let i = 0; i < config.collections.length; i++) {
           const collection = config.collections[i];
@@ -246,9 +252,9 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .collection(`${local.siteDocument}${collection}`)
       .get()
-      .then((returnQuery) => {
+      .then(returnQuery => {
         const entries = [];
-        returnQuery.forEach((doc) => {
+        returnQuery.forEach(doc => {
           const data = doc.data();
           local.FilePathFactory(data.path).updateInfo({
             collection,
@@ -262,7 +268,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
         });
         return entries;
       })
-      .catch((error) => {
+      .catch(error => {
         throw new Error(error.message);
       });
   }
@@ -271,7 +277,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     local.log(`entriesByFiles`, fileList);
     const firestoreDB = local.db();
 
-    const files = fileList.map((collectionFile) => {
+    const files = fileList.map(collectionFile => {
       const config = local.getFileCollectionByPath(collectionFile.path);
       const documentId = local.getDocumentId(config.collection, config.name);
       return {
@@ -285,12 +291,12 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     });
 
     return Promise.all(
-      files.map((file) => {
+      files.map(file => {
         local.log('getting file', file);
         return firestoreDB
           .doc(`${local.siteDocument}${file.collectionName}/${file.documentId}`)
           .get()
-          .then((doc) => {
+          .then(doc => {
             if (!doc.exists)
               throw new Error(`Entry is missing for [${file.collectionName}/${file.documentId}]`);
             const data = doc.data();
@@ -303,7 +309,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
               data: Buffer.from(data.content.toUint8Array()).toString('utf-8'),
             });
           })
-          .catch((error) => {
+          .catch(error => {
             throw new Error(error);
           });
       }),
@@ -324,7 +330,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       firestoreDB
         .doc(`${local.siteDocument}${documentPath}`)
         .get()
-        .then((doc) => {
+        .then(doc => {
           // If doc doesn't exist return a new file object
           if (!doc.exists) return { file: { path, id: null }, data: '' };
           const data = doc.data();
@@ -334,7 +340,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
             // data.content is of type firestore.Blob data.content.q.M
           };
         })
-        .catch((error) => {
+        .catch(error => {
           throw new Error(error);
         }),
     );
@@ -371,11 +377,11 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .doc(`${local.siteDocument}${options.collectionName}/${documentId}`)
       .get()
-      .then((publishedDoc) => {
+      .then(publishedDoc => {
         if (publishedDoc.exists) {
           return publishedDoc.ref
             .update(storedEntry)
-            .then((returnQuery) => {
+            .then(returnQuery => {
               local.FilePathFactory(storedEntry.path).updateInfo({
                 collection: options.collectionName,
                 id: documentId,
@@ -383,13 +389,13 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
               if (local.build_hooks.master) axios.post(local.build_hooks.master);
               return Promise.resolve();
             })
-            .catch((error) => {
+            .catch(error => {
               return Promise.reject(error);
             });
         } else {
           return publishedDoc.ref
             .set(storedEntry)
-            .then((returnQuery) => {
+            .then(returnQuery => {
               local.FilePathFactory(storedEntry.path).updateInfo({
                 collection: options.collectionName,
                 id: documentId,
@@ -397,12 +403,12 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
               if (local.build_hooks.master) axios.post(local.build_hooks.master);
               return Promise.resolve();
             })
-            .catch((error) => {
+            .catch(error => {
               return Promise.reject(error);
             });
         }
       })
-      .catch((error) => {
+      .catch(error => {
         return Promise.reject(error);
       });
   }
@@ -411,7 +417,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
   async function persistEntry({ dataFiles, assets }, options) {
     local.log(`persistEntry`, dataFiles, assets, options);
 
-    await Promise.all(assets.map((item) => persistMedia(item)));
+    await Promise.all(assets.map(item => persistMedia(item)));
 
     if (options.useWorkflow) {
       const slug = dataFiles[0].slug;
@@ -423,16 +429,16 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
         optionsStatus: options.status,
       });
     }
-    return Promise.all(dataFiles.map((entry) => updateEntry(entry, options)));
+    return Promise.all(dataFiles.map(entry => updateEntry(entry, options)));
   }
 
   async function getMedia(mediaFolder = local.mediaFolder) {
-    console.log(`getMedia`, mediaFolder);
+    local.log(`getMedia`, mediaFolder);
     const listRef = local.mediaRef.child(mediaFolder);
 
     const res = await listRef.listAll();
     return await Promise.all(
-      res.items.map(async (itemRef) => {
+      res.items.map(async itemRef => {
         //   Lists of folderRef
         //   res.prefixes.forEach(function (folderRef) {
         //     // All the prefixes under listRef.
@@ -441,7 +447,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
         // All the items under listRef.
         const url = await itemRef.getDownloadURL();
 
-        return itemRef.getMetadata().then((item) => {
+        return itemRef.getMetadata().then(item => {
           // console.log('image item:', item)
           return {
             id: item.md5Hash,
@@ -456,13 +462,13 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
   }
 
   async function getMediaFile(imagePath) {
-    console.log('getMediaFile', imagePath);
+    local.log('getMediaFile', imagePath);
     const itemRef = await local.mediaRef.child(imagePath);
     const url = await itemRef.getDownloadURL();
 
     const item = await itemRef
       .getMetadata()
-      .then((item) => {
+      .then(item => {
         return {
           id: item.md5Hash,
           name: item.name,
@@ -471,7 +477,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
           displayURL: url,
         };
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error.message);
         return { displayURL: url };
       });
@@ -479,23 +485,23 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return item;
   }
 
-  const deleteMediaFile = (imagePath) => {
-    console.log('deleteMediaFile', imagePath);
+  const deleteMediaFile = imagePath => {
+    local.log('deleteMediaFile', imagePath);
     var mediaFileRef = local.mediaRef.child(imagePath);
 
     // Delete the file
     return mediaFileRef
       .delete()
-      .then(function () {
+      .then(function() {
         return Promise.resolve();
       })
-      .catch(function (error) {
+      .catch(function(error) {
         return Promise.reject(error.message);
       });
   };
 
   function persistMedia({ fileObj }) {
-    console.log('persistMedia', fileObj);
+    local.log('persistMedia', fileObj);
     const { name, size } = fileObj;
     const imagePath = `${local.mediaFolder}/${name}`;
     const imageRef = local.mediaRef.child(imagePath);
@@ -503,11 +509,11 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
 
     return imageRef
       .put(fileObj)
-      .then((snapshot) => {
+      .then(snapshot => {
         return snapshot.ref.getDownloadURL();
       })
-      .then((downloadURL) => {
-        console.log('imageUploaded', downloadURL);
+      .then(downloadURL => {
+        local.log('imageUploaded', downloadURL);
         return Promise.resolve({
           id: imagePath,
           name,
@@ -516,15 +522,15 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
           displayURL: downloadURL,
         });
       })
-      .catch((error) => {
+      .catch(error => {
         Promise.reject(error);
       });
   }
 
   function deleteFiles(paths, commitMessage) {
-    console.log(`deleteFiles`, paths, commitMessage);
+    local.log(`deleteFiles`, paths, commitMessage);
     return Promise.all(
-      paths.map((path) => {
+      paths.map(path => {
         return deleteFile(path, commitMessage);
       }),
     );
@@ -544,14 +550,14 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       .collection(`${local.siteDocument}${info.collection}`)
       .doc(info.id)
       .get()
-      .then((doc) => {
-        doc.ref.delete().then((returnQuery) => {
+      .then(doc => {
+        doc.ref.delete().then(returnQuery => {
           local.FilePathFactory(path).deleteInfo();
           local.log('deleteFile returnQuery', returnQuery);
           return Promise.resolve();
         });
       })
-      .catch((error) => {
+      .catch(error => {
         Promise.reject(error);
       });
   }
@@ -561,16 +567,16 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .collection(`${local.siteDocument}__unpublished`)
       .get()
-      .then((querySnapshot) => {
+      .then(querySnapshot => {
         const items = [];
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           const data = doc.data();
           items.push(doc.id);
         });
         local.log(`unpublishedEntries=>`, items);
         return Promise.resolve(items);
       })
-      .catch((error) => {
+      .catch(error => {
         return Promise.reject(error);
       });
   }
@@ -597,14 +603,14 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .doc(`${local.siteDocument}${collection}/${publishedId}`)
       .get()
-      .then((publishedDoc) => {
+      .then(publishedDoc => {
         return firestoreDB
           .doc(`${local.siteDocument}__unpublished/${unpublishedId}`)
           .get()
-          .then((unpublishedDoc) => {
+          .then(unpublishedDoc => {
             if (unpublishedDoc.exists) {
               const data = unpublishedDoc.data();
-              const decodedDiffs = data.diffs.map((file) => {
+              const decodedDiffs = data.diffs.map(file => {
                 file.raw = Buffer.from(file.content.toUint8Array()).toString('utf-8');
                 return file;
               });
@@ -645,11 +651,11 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .doc(`${local.siteDocument}${collection}/${publishedId}`)
       .get()
-      .then((publishedDoc) => {
+      .then(publishedDoc => {
         return firestoreDB
           .doc(`${local.siteDocument}__unpublished/${unpublishedId}`)
           .get()
-          .then((unpublishedDoc) => {
+          .then(unpublishedDoc => {
             let original;
             if (unpublishedDoc.exists) {
               original = unpublishedDoc.data();
@@ -660,9 +666,9 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
 
             const diffs = [];
             const enc = new TextEncoder();
-            dataFiles.forEach((dataFile) => {
+            dataFiles.forEach(dataFile => {
               const { path, newPath, raw } = dataFile;
-              const currentDataFile = original.diffs.find((d) => d.path === path);
+              const currentDataFile = original.diffs.find(d => d.path === path);
               const originalPath = currentDataFile ? currentDataFile.originalPath : path;
               const info = local.FilePathFactory(originalPath).getInfo() || { id: publishedId };
               diffs.push({
@@ -688,30 +694,30 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
             if (docRef.exists) {
               return docRef
                 .update(storedEntry)
-                .then((returnQuery) => {
+                .then(returnQuery => {
                   if (local.build_hooks.preview) axios.post(local.build_hooks.preview);
                   return Promise.resolve();
                 })
-                .catch((error) => {
+                .catch(error => {
                   return Promise.reject(error);
                 });
             } else {
               return docRef
                 .set(storedEntry)
-                .then((returnQuery) => {
+                .then(returnQuery => {
                   if (local.build_hooks.preview) axios.post(local.build_hooks.preview);
                   return Promise.resolve();
                 })
-                .catch((error) => {
+                .catch(error => {
                   return Promise.reject(error);
                 });
             }
           })
-          .catch((error) => {
+          .catch(error => {
             Promise.reject(error);
           });
       })
-      .catch((error) => {
+      .catch(error => {
         Promise.reject(new Error(error));
       });
   }
@@ -720,8 +726,8 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     local.log('unpublishedEntryDataFile', collection, slug, path, id);
 
     return unpublishedEntry({ collection, slug })
-      .then((entry) => {
-        const file = entry.diffs.find((d) => d.path === path);
+      .then(entry => {
+        const file = entry.diffs.find(d => d.path === path);
         if (!file) {
           return Promise.reject(
             new EditorialWorkflowError(`content Missing from entry for path [${path}]`, true),
@@ -729,7 +735,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
         }
         return Promise.resolve(file.raw);
       })
-      .catch((error) => {
+      .catch(error => {
         return Promise.reject(error);
       });
   }
@@ -746,7 +752,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .doc(`${local.siteDocument}__unpublished/${unpublishedId}`)
       .get()
-      .then((unpublishedDoc) => {
+      .then(unpublishedDoc => {
         if (unpublishedDoc.exists) {
           unpublishedDoc.ref.update({
             status: newStatus || 'draft',
@@ -770,14 +776,14 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
       .collection(`${local.siteDocument}${'__unpublished'}`)
       .doc(`${unpublishedId}`)
       .get()
-      .then((unpublishedDoc) => {
+      .then(unpublishedDoc => {
         const data = unpublishedDoc.data();
-        unpublishedDoc.ref.delete().then((returnQuery) => {
+        unpublishedDoc.ref.delete().then(returnQuery => {
           local.log('deleteUnpublishedEntry done:', returnQuery, data.path);
           return Promise.resolve();
         });
       })
-      .catch((error) => {
+      .catch(error => {
         throw new Error(error);
       });
   }
@@ -791,14 +797,14 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
     return firestoreDB
       .doc(`${local.siteDocument}__unpublished/${unpublishedId}`)
       .get()
-      .then((unpublishedDoc) => {
+      .then(unpublishedDoc => {
         if (unpublishedDoc.exists) {
           const unpublishedData = unpublishedDoc.data();
           if (!(unpublishedData.status === 'pending_publish')) {
             throw `Document "${unpublishedData.metaData.title}" status is [${unpublishedData.metaData.status}], change to [Ready]`;
           }
           return Promise.all(
-            unpublishedData.diffs.map((d) => {
+            unpublishedData.diffs.map(d => {
               local.log(`publishUnpublishedEntry paths:`, d.originalPath, d.newFile);
               if (d.originalPath && !d.newFile) {
                 if (d.originalPath !== d.newPath) {
@@ -810,7 +816,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
               return firestoreDB
                 .doc(`${local.siteDocument}${collectionName}/${publishedId}`)
                 .get()
-                .then((publishedDoc) => {
+                .then(publishedDoc => {
                   const options = {
                     collectionName,
                     commitMessage: `Update ${collectionName} '${slug}'`,
@@ -826,12 +832,12 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
                     },
                   ];
                   local.log('!!!!', { dataFiles, assets: [] }, options);
-                  return persistEntry({ dataFiles, assets: [] }, options).then((entry) => {
+                  return persistEntry({ dataFiles, assets: [] }, options).then(entry => {
                     local.log(`${collectionName}/${slug} published`);
                     return deleteUnpublishedEntry(collectionName, unpublishedData.slug);
                   });
                 })
-                .catch((error) => Promise.reject(error));
+                .catch(error => Promise.reject(error));
             }),
           );
         } else {
@@ -840,7 +846,7 @@ const NetlifyCmsBackendFirestore = function (config, options = {}) {
           );
         }
       })
-      .catch((error) => Promise.reject(error));
+      .catch(error => Promise.reject(error));
   }
 
   return Object.freeze({
