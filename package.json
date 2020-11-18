@@ -31,5 +31,13 @@
     "last 2 Safari versions",
     "last 2 iOS versions",
     "last 2 ChromeAndroid versions"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  }
 }
