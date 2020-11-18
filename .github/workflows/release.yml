@@ -18,8 +18,8 @@ jobs:
       - name: Setup Node.js 14.x
         uses: actions/setup-node@v2-beta
         with:
-          node-version: "14"
-          registry-url: "https://registry.npmjs.org"
+          node-version: '14'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
         run: yarn
