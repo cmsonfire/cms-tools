@@ -16,25 +16,25 @@ const getUIConfig = ({ auth, signInOptions }) => {
     // Sets the `signedIn` state property to `true` once signed in.
     callbacks: {
       signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-        console.log('signedIn: true', authResult, redirectUrl)
-        return false // Return type determines whether we continue the redirect automatically
+        console.log('signedIn: true', authResult, redirectUrl);
+        return false; // Return type determines whether we continue the redirect automatically
         // or whether we leave that to developer to handle (false).
       },
     },
     signInFlow: 'popup',
-  }
-  if (!auth) throw 'Firebase Auth Missing'
+  };
+  if (!auth) throw 'Firebase Auth Missing';
   if (signInOptions)
     uiConfig.signInOptions = signInOptions.map((item) => {
       if (typeof item === 'string') {
-        return auth[item].PROVIDER_ID
+        return auth[item].PROVIDER_ID;
       }
       if (item.provider) {
-        return { provider: auth[item.provider].PROVIDER_ID, ...item.options }
+        return { provider: auth[item.provider].PROVIDER_ID, ...item.options };
       }
-      return null
-    })
-  return uiConfig
-}
+      return null;
+    });
+  return uiConfig;
+};
 
-export default getUIConfig
+export default getUIConfig;
