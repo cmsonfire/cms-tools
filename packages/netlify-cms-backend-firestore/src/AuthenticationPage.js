@@ -1,28 +1,52 @@
 import React from 'react';
-import styled from '@emotion/styled';
 
 import FirebaseLogin from './components/FirebaseLogin';
 import getConfig from './components/FirebaseLogin/config';
 import { firebase } from 'firebase-react-provider';
 
-const SectionWrapper = styled('section')`
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-`;
-const IconWrapper = styled('span')`
-  width: 300px;
-  height: 200px;
-  margin-top: -150px;
-`;
-const LogoImage = styled('img')`
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-`;
+const SectionWrapper = ({ children, ...props }) => {
+  return (
+    <section
+      {...props}
+      style={{
+        display: 'flex',
+        flexFlow: 'column nowrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {children}
+    </section>
+  );
+};
+
+const IconWrapper = ({ children, ...props }) => {
+  return (
+    <span
+      {...props}
+      style={{
+        width: '300px',
+        height: 'auto',
+        padding: '30px',
+      }}
+    >
+      {children}
+    </span>
+  );
+};
+const LogoImage = ({ children, ...props }) => {
+  return (
+    <img
+      {...props}
+      style={{
+        display: 'block',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        width: '50%',
+      }}
+    />
+  );
+};
 
 const CustomLogoIcon = ({ imageSrc }) => {
   return (
@@ -50,15 +74,6 @@ function AuthenticationPage({ config, onLogin, inProgress }) {
   };
 
   React.useEffect(() => {
-    /**
-     * Hack at this point to use firebase state from implementation
-     * because there is no state passed at this time.
-     */
-    // const firebase = window['__firebasecms__'].firebase
-    // console.log('firebase:',firebase)
-    // if (!firebase) throw 'firebase missing'
-    // if (firebase && !firebase.auth) throw 'firebase auth missing'
-
     /**
      * Get the signInOptions from the config to build uiConfig using getConfig
      */
