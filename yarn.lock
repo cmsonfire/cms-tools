@@ -1141,6 +1141,35 @@
     human-id "^1.0.2"
     prettier "^1.18.2"
 
+"@cmsonfire/admin-provider@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@cmsonfire/admin-provider/-/admin-provider-0.2.1.tgz#f4ed1162a6ade0e4ad6baf262254fe91960414d9"
+  integrity sha512-wsnNYrIaR5gjiG8lWQPJqHPWtjkTwgS3QpVpigrsttUTIuHzs7vZ290eAf5fGPzgyPI3g0CJMTQFO++aWCGFfg==
+  dependencies:
+    "@babel/runtime" "^7.12.1"
+    firebase "^7.23.0"
+    prop-types "^15.7.2"
+
+"@cmsonfire/firestore-provider@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@cmsonfire/firestore-provider/-/firestore-provider-1.0.1.tgz#0104f849c0c075b66cddfd766c41d1e8fe4c77b0"
+  integrity sha512-aDroS+1SteuLpePNWVdSuOTDLvOuNSTmNWYhyM9TCbSZNlVyBVOLJiW5p4qbBRPqqa1oa1APVOIYdilaDERSeA==
+  dependencies:
+    "@babel/runtime" "^7.12.1"
+    "@cmsonfire/admin-provider" "0.2.1"
+    firebase "^7.23.0"
+    prop-types "^15.7.2"
+
+"@cmsonfire/storage-provider@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@cmsonfire/storage-provider/-/storage-provider-1.0.1.tgz#6b9df0954b9ad059b12d772d0f66f70da492b300"
+  integrity sha512-9m17CP78qdCrQZv3QviYCUh/OFtfLZD/UOXgQH0tnMZjOwH+sK49amsLegcv8O8TKlg64POyM7A4p9kTS7xBdw==
+  dependencies:
+    "@babel/runtime" "^7.12.1"
+    "@cmsonfire/admin-provider" "0.2.1"
+    firebase "^7.23.0"
+    prop-types "^15.7.2"
+
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@firebase/analytics-types/-/analytics-types-0.4.0.tgz#d6716f9fa36a6e340bc0ecfe68af325aa6f60508"
@@ -2746,14 +2775,16 @@ findup-sync@^3.0.0:
     micromatch "^3.0.4"
     resolve-dir "^1.0.1"
 
-firebase-react-provider@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/firebase-react-provider/-/firebase-react-provider-0.1.6.tgz#d6e80f23ac25d4f784857f2d67a2f184f8c44d17"
-  integrity sha512-o5tSQIkxqD6tgLLaDsv0gTeA21BMOEHfLyLQHh06tQ5j6hA75GY4WyMQyUmatiF4NLW6FO2Tg5p6YPFR7RKXDw==
+firebase-react-provider@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/firebase-react-provider/-/firebase-react-provider-0.3.1.tgz#db84b9445e93a686939e0c2bc7741ff50144ef50"
+  integrity sha512-Xo2HtkCq53wvKOp7R/hXhCYrwy25syBkEGB+UswhYov5c8VVuKcbVvLSW/KuG77PKZuntgnrInGi1zsJdPrUiQ==
   dependencies:
     "@babel/runtime" "^7.12.1"
+    "@cmsonfire/admin-provider" "0.2.1"
+    "@cmsonfire/firestore-provider" "1.0.1"
+    "@cmsonfire/storage-provider" "1.0.1"
     firebase "^7.23.0"
-    prop-types "^15.7.2"
 
 firebase@^7.23.0:
   version "7.24.0"
