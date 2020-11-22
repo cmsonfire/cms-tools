@@ -1,6 +1,6 @@
 {
   "name": "netlify-cms-backend-firestore",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Backend for Netlify CMS to use Google Firestore",
   "repository": {
     "type": "git",

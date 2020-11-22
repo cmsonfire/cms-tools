@@ -1,5 +1,11 @@
 # netlify-cms-backend-firestore
 
+## 0.1.2
+
+### Patch Changes
+
+- 55404b1: remove deps; bump provider version
+
 ## 0.1.1
 
 ### Patch Changes
